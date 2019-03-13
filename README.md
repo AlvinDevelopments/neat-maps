@@ -13,14 +13,20 @@ This app allows users to upload up to 3 csv files with location information (Add
 - Axios (For REST API Calls)
 - Material UI (Styled component UI)
 
+- Neat User API
+- Google Javascript API (React Component Library)
+- Google Geocode API
+
 ## How To Build/Run
 
 1. Navigate to the neat-maps project folder
 
 2. ```yarn install```
 
-3. ```cp .env.exmaple .env```
+3. ```cp .env.example .env```
 
 4. Fill in the Google Maps API Key in the .env file (Make sure Google GeoCode API is enabled)
 
 5. ```yarn start```
+
+6. Project is now active on http://localhost:3000/
