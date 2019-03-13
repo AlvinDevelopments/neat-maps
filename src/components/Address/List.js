@@ -1,52 +1,75 @@
 import React from 'react';
-import { TableRow, TableCell, Table } from '@material-ui/core';
+import { TableRow, TableCell, Table, Typography, TableBody } from '@material-ui/core';
+import { connect } from 'react-redux';
 
 const AddressList = (props) => {
+    console.log(props.categories);
     return (
-        <div>
-            <Table>
-                <TableRow>
-                    <TableCell align='left'>
+        <Table>
+            <TableBody>
+
+            <TableRow>
+                <TableCell align='left'>
+                    <Typography variant='button'>
                         Address
-                    </TableCell>
-                    <TableCell align='left'>
+                    </Typography>
+                </TableCell>
+                <TableCell align='left'>
+                    <Typography variant='button'>
                         City
-                    </TableCell>
-                    <TableCell align='left'>
+                    </Typography>
+                </TableCell>
+                <TableCell align='left'>
+                    <Typography variant='button'>
                         State
-                    </TableCell>
-                    <TableCell align='left'>
-                        ZIP Code
-                    </TableCell>
-                    <TableCell align='left'>
+                    </Typography>
+                </TableCell>
+                <TableCell align='left'>
+                    <Typography variant='button'>
+                        Zip Code
+                    </Typography>
+                </TableCell>
+                <TableCell align='left'>
+                    <Typography variant='button'>
                         Category
-                    </TableCell>
-                </TableRow>
-                {
-                    props.locationList && props.locationList.slice(1, props.locationList.length-1).map(location => 
-                        <TableRow>
-                            <TableCell>
-                                {location.address}
-                            </TableCell>
-                            <TableCell>
-                                {location.city}
-                            </TableCell>
-                            <TableCell>
-                                {location.state}
-                            </TableCell>
-                            <TableCell>
-                                {location.zipCode}
-                            </TableCell>
-                            <TableCell>
-                                {location.category}
-                            </TableCell>
-                        </TableRow>
-                    )
-                }
-            </Table>
-        </div>
-    )
+                    </Typography>
+                </TableCell>
+            </TableRow>
+            {
+                props.locationList && props.locationList.map(location => 
+                    <TableRow>
+                        <TableCell>
+                            {location.address}
+                        </TableCell>
+                        <TableCell>
+                            {location.city}
+                        </TableCell>
+                        <TableCell>
+                            {location.state}
+                        </TableCell>
+                        <TableCell>
+                            {location.zipCode}
+                        </TableCell>
+                        <TableCell style={{
+                            color: props.categories && 
+                            props.categories.length > 0 && 
+                            props.categories.find(c=>{return c.category === location.category}) && 
+                            props.categories.find(c=>{return c.category === location.category}).color
+                        }}>
+                            {location.category}
+                        </TableCell>
+                    </TableRow>
+                )
+            }
+            </TableBody>
+        </Table>
+    );
 }
 
+const mapStateToProps = (state) => ({
+    categories: state.locationCategories[state.selectedLocationData]
+})
 
-export default AddressList;
+export default connect(
+    mapStateToProps
+)(AddressList);

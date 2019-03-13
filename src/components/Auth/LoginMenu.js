@@ -1,5 +1,8 @@
 import React, { Component } from 'react';
 import { TextField, Button } from '@material-ui/core';
+import { compose } from 'redux';
+import { connect } from 'react-redux';
+import { signIn } from '../../redux/actions';
 
 class LoginMenu extends Component {
     constructor(props) {
@@ -22,28 +25,54 @@ class LoginMenu extends Component {
         });
     }
 
+    handleSubmit = () => {
+        this.props.handleLogin(this.state.username, this.state.password);
+    }
+
     render() {
         return (
-            <div>
+            <form>
                 <TextField
+                fullWidth
+                onKeyDown={(e)=>{e.keyCode === 13 && this.handleSubmit()}}
                 onChange={(e)=>this.handleUsername(e.target.value)}
                 value={this.state.username}
                 label='username'
                 />
                 <br/>
                 <TextField
+                fullWidth
+                onKeyDown={(e)=>{e.keyCode === 13 && this.handleSubmit()}}
                 onChange={(e)=>this.handlePassword(e.target.value)}
                 value={this.state.password}
                 label='password'
                 type='password'
                 />
-                <br/>
-                <Button>
+                <Button
+                style={{
+                    margin:'5% 0%'
+                }}
+                fullWidth
+                variant='contained'
+                onClick={this.handleSubmit}>
                     Login
                 </Button>
-            </div>
+            </form>
         )
     }
 }
 
-export default LoginMenu;
+const mapStateToProps = (state) => ({
+
+});
+
+const mapDispatchToProps = (dispatch) => ({
+    handleLogin: (email, password) => dispatch(signIn(email, password))
+});
+
+export default compose(
+    connect(
+        mapStateToProps,
+        mapDispatchToProps
+    )
+)(LoginMenu);
