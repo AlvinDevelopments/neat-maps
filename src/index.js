@@ -4,16 +4,20 @@ import './index.css';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
 import { BrowserRouter as Router, Route } from 'react-router-dom';
-import { store } from './redux/configureStore';
+import configureStore from './redux/configureStore';
 import { Provider } from 'react-redux';
+import { PersistGate } from 'redux-persist/integration/react';
+const { store, persistor } = configureStore();
 
 require('dotenv').config();
 
 ReactDOM.render(
     <Provider store={store}>
-        <Router>
-            <App />
-        </Router>
+        <PersistGate persistor={persistor} loading={<div>Loading!</div>}>
+            <Router>
+                <App />
+            </Router>
+        </PersistGate>
     </Provider>
     , document.getElementById('root'));
 
