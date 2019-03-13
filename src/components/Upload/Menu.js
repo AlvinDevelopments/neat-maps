@@ -4,14 +4,12 @@ import { closeUploadModal, addNewLocation } from '../../redux/actions';
 import { compose } from 'redux';
 import { connect } from 'react-redux';
 import CSVReader from 'react-csv-reader'
-import { cpus } from 'os';
 
 class UploadMenu extends Component {
     constructor(props) {
         super(props);
         this.state = {
             page: 1,
-            uploadedFile: null,
             errorMessage: '',
             locationArray: [],
             indexes: [0,1,2,3,4]
@@ -20,6 +18,12 @@ class UploadMenu extends Component {
 
     handleFile = (data) => {
         this.setState({locationArray: data});
+
+        if(data.length === 0){
+            this.setState({errorMessage:'csv cannot be empty', page: 1})
+        } else {
+            this.setState({errorMessage: '', page: 2});
+        }
     }
 
     handleClose = () => {
@@ -54,19 +58,10 @@ class UploadMenu extends Component {
             }
         });
 
-        this.props.addNewLocation([{
-            cityIndex: cityIndex,
-            addressIndex: addressIndex,
-            stateIndex: stateIndex,
-            zipCodeIndex: zipCodeIndex,
-            categoryIndex: categoryIndex
-        }, ...locations ]);
+        this.props.addNewLocation(locations);
 
         this.handleClose();
         this.setState({locationArray:[], errorMessage:'', page: 1, indexes: [0,1,2,3,4]})
-    }
-
-    importCsvResults = () => {
     }
 
     handleNextPage = () => {
@@ -82,35 +77,46 @@ class UploadMenu extends Component {
         return (
             <Modal
             style={{
-                height:'50px',
-                position:'absolute',
-                top:'30%',
-                left:'10%'
+                width:'800px',
+                height:'900px',
+                margin: 'auto auto',
             }}
-            onClose={this.handleClose}
             open={props.open}
             >
-            {
-                this.state.page === 1 ?
-                <SelectCsv
-                importCsvResults={this.importCsvResults}
-                addNewLocation={this.addNewLocation}
-                errorMessage={this.state.errorMessage}
-                handleFile={(e)=>this.handleFile(e)}
-                // disabled={this.state.uploadedFile == null}
-                disabled={this.state.locationArray.length === 0}
-                handleNextPage={this.handleNextPage}
-                handlePreviousPage={this.handlePreviousPage}
-                /> 
-                : 
-                <SetHeaders
-                handleChangeIndex={this.handleChangeIndex}
-                indexes={this.state.indexes}
-                addNewLocation={this.addNewLocation}
-                locationArray={this.state.locationArray}
-                handlePreviousPage={this.handlePreviousPage}
-                />
-            }
+                <React.Fragment>
+                    <Button
+                    style={{
+                        position:'absolute',
+                        right:'0'
+                    }}
+                    onClick={this.handleClose}
+                    >
+                        Close
+                    </Button>
+                    <Paper style={{padding:'25px 0px'}} >
+                    {
+                        this.state.page === 1 ?
+                        <SelectCsv
+                        importCsvResults={this.importCsvResults}
+                        addNewLocation={this.addNewLocation}
+                        errorMessage={this.state.errorMessage}
+                        handleFile={(e)=>this.handleFile(e)}
+                        disabled={this.state.locationArray.length === 0}
+                        handleNextPage={this.handleNextPage}
+                        handlePreviousPage={this.handlePreviousPage}
+                        /> 
+                        :
+                        <SetHeaders
+                        // errorMessage={this.error}
+                        handleChangeIndex={this.handleChangeIndex}
+                        indexes={this.state.indexes}
+                        addNewLocation={this.addNewLocation}
+                        locationArray={this.state.locationArray}
+                        handlePreviousPage={this.handlePreviousPage}
+                        />
+                    }
+                    </Paper>
+                </React.Fragment>
             </Modal>
         )
     }
@@ -118,107 +124,98 @@ class UploadMenu extends Component {
 
 const SelectCsv = (props) => {
     return (
-        <Paper>
+        <div style={{textAlign: 'center'}}>
             <Typography variant='h5'>
-                Upload
+                Upload CSV
             </Typography>
             <CSVReader
+            inputStyle={{ display: 'none'}}
             onFileLoaded={(data)=> props.handleFile(data)}
             inputId="csv"
-            // inputStyle={{color: 'grey', display:'none'}}
             />
+            <Button variant='contained' onClick={()=>document.getElementById('csv').click()}>
+                Select CSV File
+            </Button>
             {props.errorMessage}
             <br/>
-            You may save up to 3 csv file results at a time,
-            if there's more than 3, the oldest will be overwritten!!
-            <br/>
-            <Button
-            disabled={props.disabled}
-            onClick={props.handleNextPage}
-            >
-                Next
-            </Button>
-        </Paper>
+        </div>
     )
 };
+
+const HeaderSelect = ({indexes, col, handleChangeIndex}) => {
+    return (
+        <Select 
+        value={indexes[col]}
+        onChange={(e)=>handleChangeIndex(col, e.target.value)}
+        >
+            <MenuItem value={0}> Address </MenuItem>
+            <MenuItem value={1}> City </MenuItem>
+            <MenuItem value={2}> State </MenuItem>
+            <MenuItem value={3}> ZIP Code </MenuItem>
+            <MenuItem value={4}> Category </MenuItem>
+        </Select>
+    )
+}
 
 const SetHeaders = (props) => {
     let { indexes } = props;
     return (
         <div>
-            <Paper>
-            Set The CSV Headers<br/>
-            <Table style={{overflow:'scroll'}}>
+            <Typography variant='h5'>
+                Set The CSV Headers
+            </Typography>
+        <div
+        style={{
+            height: '300px',
+            overflow:'scroll'
+        }}>
+            <Table>
                 <TableRow>
                     <TableCell>
-                        <Select 
-                        value={indexes[0]}
-                        onChange={(e)=>props.handleChangeIndex(0, e.target.value)}
-                        >
-                        <MenuItem value={0}> Address </MenuItem>
-                        <MenuItem value={1}> City </MenuItem>
-                        <MenuItem value={2}> State </MenuItem>
-                        <MenuItem value={3}> ZIP Code </MenuItem>
-                        <MenuItem value={4}> Category </MenuItem>
-                        </Select>
+                        <HeaderSelect 
+                        indexes={indexes}
+                        col={0}
+                        handleChangeIndex={props.handleChangeIndex}
+                        />
                     </TableCell>
                     <TableCell>
-                        <Select 
-                        value={indexes[1]}
-                        onChange={(e)=>props.handleChangeIndex(1, e.target.value)}
-                        >
-                            <MenuItem value={0}> Address </MenuItem>
-                            <MenuItem value={1}> City </MenuItem>
-                            <MenuItem value={2}> State </MenuItem>
-                            <MenuItem value={3}> ZIP Code </MenuItem>
-                            <MenuItem value={4}> Category </MenuItem>
-                        </Select>
+                        <HeaderSelect 
+                        indexes={indexes}
+                        col={1}
+                        handleChangeIndex={props.handleChangeIndex}
+                        />
                     </TableCell>
                     <TableCell>
-                    <Select 
-                    value={indexes[2]}
-                    onChange={(e)=>props.handleChangeIndex(2, e.target.value)}
-                    >
-                            <MenuItem value={0}> Address </MenuItem>
-                            <MenuItem value={1}> City </MenuItem>
-                            <MenuItem value={2}> State </MenuItem>
-                            <MenuItem value={3}> ZIP Code </MenuItem>
-                            <MenuItem value={4}> Category </MenuItem>
-                        </Select>
+                        <HeaderSelect 
+                        indexes={indexes}
+                        col={2}
+                        handleChangeIndex={props.handleChangeIndex}
+                        />
                     </TableCell>
                     <TableCell>
-                        <Select 
-                        value={indexes[3]}
-                        onChange={(e)=>props.handleChangeIndex(3, e.target.value)}
-                        >
-                            <MenuItem value={0}> Address </MenuItem>
-                            <MenuItem value={1}> City </MenuItem>
-                            <MenuItem value={2}> State </MenuItem>
-                            <MenuItem value={3}> ZIP Code </MenuItem>
-                            <MenuItem value={4}> Category </MenuItem>
-                        </Select>
+                        <HeaderSelect 
+                        indexes={indexes}
+                        col={3}
+                        handleChangeIndex={props.handleChangeIndex}
+                        />
                     </TableCell>
                     <TableCell>
-                        <Select 
-                        value={indexes[4]}
-                        onChange={(e)=>props.handleChangeIndex(4, e.target.value)}
-                        >
-                            <MenuItem value={0}> Address </MenuItem>
-                            <MenuItem value={1}> City </MenuItem>
-                            <MenuItem value={2}> State </MenuItem>
-                            <MenuItem value={3}> ZIP Code </MenuItem>
-                            <MenuItem value={4}> Category </MenuItem>
-                        </Select>
+                        <HeaderSelect 
+                        indexes={indexes}
+                        col={4}
+                        handleChangeIndex={props.handleChangeIndex}
+                        />
                     </TableCell>
                 </TableRow>
                 {
                     props.locationArray.map(location=>
                         <TableRow>
                             {location.map(field=>
-                                <TableCell align='left' >{field}</TableCell>)}
+                                <TableCell align='left' > { field } </TableCell>)}
                         </TableRow>)
                 }
             </Table>
+            </div>
             <Button onClick={props.handlePreviousPage}>
                 Prev
             </Button>
@@ -227,15 +224,14 @@ const SetHeaders = (props) => {
             >
                 Next
             </Button>
-        </Paper>
-        </div>
+            {props.errorMessage}
+            </div>
+
     )
 }
 
 
-
 const mapStateToProps = (state) => ({
-
 });
 
 const mapDispatchToProps = (dispatch) => ({
