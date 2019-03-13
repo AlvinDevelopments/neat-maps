@@ -11,12 +11,9 @@ import PlaceIcon from '@material-ui/icons/Place';
 class MainPage extends Component {
     constructor(props){
         super(props);
-        this.state = {
-            
-        }
+        this.state = {}
     }
-    componentDidMount(){
-    }
+
     render(){
         let props = this.props;
 
@@ -93,12 +90,12 @@ class MainPage extends Component {
                         {
                             props.locationData && 
                             props.locationData[props.selectedLocationData] && 
-                            props.locationData[props.selectedLocationData] && 
                             props.locationData[props.selectedLocationData].map(location=>
                             location.marker != null && location.marker.lat &&
                             <PlaceIcon
                             style={{
-                                color: props.locationCategories[props.selectedLocationData].find((a)=>{return a.category === location.category}) && 
+                                color: props.locationCategories[props.selectedLocationData] &&
+                                props.locationCategories[props.selectedLocationData].find((a)=>{return a.category === location.category}) && 
                                 props.locationCategories[props.selectedLocationData].find((a)=>{return a.category === location.category}).color
                             }}
                             lat={location.marker.lat}

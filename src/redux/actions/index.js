@@ -93,6 +93,8 @@ export const addNewLocation = (locationData) => {
                 });
             });
 
+            dispatch(setActiveList(0));
+
             dispatch({
                 type: 'ADD_LOCATION_DATA',
                 locationData

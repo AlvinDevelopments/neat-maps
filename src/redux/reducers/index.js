@@ -17,20 +17,10 @@ const uploadModal = (state = {isOpen: false}, action) => {
     }
 }
 
-const locationData = (state = [], action) => {
+const locationData = (state = [[],[],[]], action) => {
     switch(action.type) {
         case 'ADD_LOCATION_DATA':
             return [action.locationData, state[0], state[1]];
-        default:
-            return state;
-    }
-}
-
-
-const locationMarkers = (state = [], action) => {
-    switch(action.type) {
-        case 'UPDATE_MARKERS':
-            return action.markers;
         default:
             return state;
     }
@@ -45,7 +35,7 @@ const selectedLocationData = (state = 0, action) => {
     }
 }
 
-const locationCategories = (state = [], action) => {
+const locationCategories = (state = [[],[],[]], action) => {
     switch(action.type) {
         case 'ADD_CATEGORY':
             return [action.categories, state[0], state[1]];
@@ -59,7 +49,6 @@ const userAccount = (state = null, action) => {
         case 'SIGN_OUT':
             return null;
         case 'SIGN_IN':
-            console.log(action.account);
             return action.account;
         default:
             return state;
@@ -81,7 +70,6 @@ export default combineReducers({
     locationCategories,
     globalError,
     userAccount,
-    locationMarkers,
     selectedLocationData,
     uploadModal,
     locationData
