@@ -80,6 +80,7 @@ class MainPage extends Component {
                     center={
                         props.locationData && 
                         props.locationData[props.selectedLocationData] && 
+                        props.locationData[props.selectedLocationData][0] &&
                         props.locationData[props.selectedLocationData][0].marker &&
                         { 
                             lat: props.locationData[props.selectedLocationData][0].marker.lat, 
